@@ -1,6 +1,6 @@
-   // Adresse ip du serveur 
+// Adresse ip du serveur 
 var ipServeur = location.hostname;
-var ws; 
+var ws;
 
 window.onload = function () {
     if (TesterLaCompatibilite()) {
@@ -21,7 +21,7 @@ function TesterLaCompatibilite() {
 /*  ***************** Connexion au serveur WebSocket ********************   */
 // 
 function ConnexionAuServeurWebsocket() {
-    ws = new WebSocket('ws://' + ipServeur + '/echo');
+    ws = new WebSocket('ws://' + ipServeur + '/qr');
 
     ws.onclose = function (evt) {
         window.alert('WebSocket close');
