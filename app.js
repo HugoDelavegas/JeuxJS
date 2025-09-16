@@ -1,5 +1,56 @@
 'use strict';
+class CQr {
+    constructor() {
+        this.question = '?';
+        this.bonneReponse = '?';
+        this.joueurs = new Array();
+    }
 
+    GetRandomInt(max) {
+        return Math.floor(Math.random() * Math.floor(max));
+    };
+    NouvelleQMult() {
+        var x = this.GetRandomInt(11);
+        var y = this.GetRandomInt(11);
+        this.question = x + '*' + y + ' =  ?';
+        this.bonneReponse = x * y;
+        aWss.broadcast(this.question);
+    };
+    TraiterReponse(wsClient, message, req) {
+        console.log('De %s %s, message :%s', req.connection.remoteAddress,
+            req.connection.remotePort, message);
+
+        if (message == this.bonneReponse) {
+            aWss.broadcast('Réponse juste');
+            setTimeout(() => {
+                console.log('waitTime');
+                this.NouvelleQMult();
+            }, '1000');
+
+        }
+        else {
+            aWss.broadcast('Réponse fausse');
+            setTimeout(() => {
+                console.log('waitTime');
+                aWss.broadcast(this.question);
+            }, '1000');
+
+        }
+
+    };
+
+    
+
+  
+
+    EnvoyerResultatDiff() {
+
+    };
+
+    Deconnecter() {
+
+    };
+}
 console.log('TP CIEL');
 
 var express = require('express'); 
@@ -121,9 +172,6 @@ exp.ws('/qr', function (ws, req) {
         }
 
         }
-    }
-
-
     function NouvelleQuestion() {
         var x = GetRandomInt(11);
         var y = GetRandomInt(11);
