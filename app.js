@@ -10,27 +10,19 @@ class CQr {
         return Math.floor(Math.random() * Math.floor(max));
     };
 
-    TraiterReponse(wsClient, message, req) {
+    TraiterReponse(wsClient, message) {
         var mess = JSON.parse(message);
-        console.log('De %s %s, message :%s', req.connection.remoteAddress,
-            req.connection.remotePort, mess);
-
-        if (mess['reponse'] == this.bonneReponse) {
-            aWss.broadcast('Réponse juste');
-            setTimeout(() => {
-                console.log('waitTime');
-                this.NouvelleQMult();
-            }, '1000');
-
+        if (mess.reponse == this.bonneReponse) {
+            this.question = "Bonne reponse de " + mess.nom;
         }
         else {
-            aWss.broadcast('Réponse fausse');
-            setTimeout(() => {
-                console.log('waitTime');
-                aWss.broadcast(this.question);
-            }, '1000');
-
+            this.question = "Mauvaise reponse de " + mess.nom;
         }
+        this.EnvoyerResultatDiff();
+        setTimeout(() => {  //affichage de la question 3s après 
+            this.NouvelleQuestion();
+        }, 3000);
+    } 
 
     };
 
@@ -64,7 +56,10 @@ class CQr {
 
 
     EnvoyerResultatDiff() {
-
+        var messagePourLesClients = {
+            question: this.question
+        };
+        aWss.broadcast(JSON.stringify(messagePourLesClients));
     };
 
     Deconnecter() {
