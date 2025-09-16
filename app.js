@@ -14,9 +14,6 @@ exp.use(function (err, req, res, next) {
     console.error(err.stack);
     res.status(500).send('Erreur serveur express');
 }); 
-exp.listen(80, function () {
-    console.log('Serveur en ecoute');
-}); 
 /*  *************** serveur WebSocket express *********************   */
 // 
 var expressWs = require('express-ws')(exp);
@@ -44,3 +41,4 @@ var portServ = 80;
 exp.listen(portServ, function () {
     console.log('Serveur en ecoute');
 }); 
+
