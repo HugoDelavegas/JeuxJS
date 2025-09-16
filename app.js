@@ -9,6 +9,7 @@ exp.use(express.static(__dirname + '/www'));
 exp.get('/', function (req, res) {
     console.log('Reponse a un client'); 
     res.sendFile(__dirname + '/www/index.html');
+    res.sendFile(__dirname + '/www/qr.html');
 }); 
 exp.use(function (err, req, res, next) {
     console.error(err.stack);
@@ -25,7 +26,6 @@ exp.ws('/echo', function (ws, req) {
         req.connection.remoteAddress, req.connection.remotePort);
 
     ws.on('message', function (message) {
-        message = ws._socket._peername.address + ws._socket._peername.port + ' : ' + message;
         aWss.broadcast(message);
         console.log('De %s %s, message :%s', req.connection.remoteAddress,
           
@@ -63,6 +63,24 @@ aWss.broadcast = function broadcast(data) {
         }
     });
 };
+var aWss = expressWs.getWss('/qr');
+var WebSocket = require('ws');
+
+aWss.broadcast = function broadcast(data) {
+    console.log("Broadcast aux clients navigateur : %s", data);
+    aWss.clients.forEach(function each(client) {
+        if (client.readyState == WebSocket.OPEN) {
+            client.send(data, function ack(error) {
+                console.log("    -  %s-%s", client._socket.remoteAddress,
+                    client._socket.remotePort);
+                if (error) {
+                    console.log('ERREUR websocket broadcast : %s', error.toString());
+                }
+            });
+        }
+    });
+};
+
 var question = '?';
 var bonneReponse = 0;
 
@@ -86,6 +104,22 @@ exp.ws('/qr', function (ws, req) {
             req.connection.remotePort, message);
         if (message == bonneReponse) {
             NouvelleQuestion();
+            aWss.broadcast('Réponse juste');
+            setTimeout(() => {
+                console.log('waitTime');
+                NouvelleQuestion();
+            }, '1000');
+
+        }
+        else {
+            aWss.broadcast('Réponse fausse');
+            setTimeout(() => {
+                console.log('waitTime');
+                aWss.broadcast(question);
+            }, '1000');
+
+        }
+
         }
     }
 
